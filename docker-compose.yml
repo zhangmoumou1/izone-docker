@@ -1,0 +1,75 @@
+version: "3"
+services:
+
+  db:
+    restart: always
+    image: ${MYSQL_IMAGE}
+    container_name: izone_db
+    volumes:
+      - ./db/mysql:/var/lib/mysql
+      - ./db/my.cnf:/etc/my.cnf:ro
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${IZONE_MYSQL_NAME}
+    networks:
+      - backend
+
+  redis:
+    restart: always
+    image: ${REDIS_IMAGE}
+    container_name: izone_redis
+    networks:
+      - backend
+
+  web:
+    restart: always
+    image: ${IZONE_IMAGE}
+    container_name: izone_web
+    environment:
+      IZONE_MYSQL_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      IZONE_MYSQL_HOST: db
+      IZONE_MYSQL_NAME: ${IZONE_MYSQL_NAME}
+      IZONE_MYSQL_USER: root
+      IZONE_MYSQL_PORT: 3306
+      IZONE_REDIS_HOST: redis
+      IZONE_REDIS_PORT: 6379
+    env_file:
+      - ./izone.env
+    command: gunicorn izone.wsgi -b 0.0.0.0:8000
+    volumes:
+      - ./web/static:/opt/cloud/izone/static
+      - ./web/media:/opt/cloud/izone/media
+      - ./web/whoosh_index:/opt/cloud/izone/whoosh_index
+    links:
+      - db
+      - redis
+    depends_on:
+      - db
+      - redis
+    networks:
+      - backend
+      - frontend
+
+  nginx:
+    restart: always
+    image: ${NGINX_IMAGE}
+    container_name: izone_nginx
+    volumes:
+      - ./web/static:/opt/izone/static:ro
+      - ./web/media:/opt/izone/media:ro
+      - ./nginx/conf.d:/etc/nginx/conf.d:ro
+      - ./nginx/ssl_cert:/etc/nginx/ssl_cert:ro
+      - ./nginx/log:/var/log/nginx
+    ports:
+      - "80:80"
+      - "443:443"
+    links:
+      - web
+    networks:
+      - frontend
+
+networks:
+  backend:
+    driver: bridge
+  frontend:
+    driver: bridge

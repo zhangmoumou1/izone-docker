@@ -18,6 +18,7 @@ services:
     restart: always
     image: ${REDIS_IMAGE}
     container_name: izone_redis
+    command: redis-server --requirepass root123456
     networks:
       - backend
 

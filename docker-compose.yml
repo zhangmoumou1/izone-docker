@@ -4,6 +4,7 @@ services:
   db:
     restart: always
     image: ${MYSQL_IMAGE}
+    command: --default-authentication-plugin=mysql_native_password
     container_name: izone_db
     volumes:
       - ./db/mysql:/var/lib/mysql
@@ -11,6 +12,8 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${IZONE_MYSQL_NAME}
+    ports:
+      - "3306:3306"
     networks:
       - backend
 

@@ -1,3 +1,3 @@
-# izone-docker
+# docker部署个人博客
 
-创建.env和izone.env文件
+🎉 详细帮助文档：<a href="http://zhangyanc.club/article/django_docker/">点击查阅</a>

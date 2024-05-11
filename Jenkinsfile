@@ -6,9 +6,9 @@ pipeline {
         timestamps()
     }
     environment {
-        GITHUB_USER_ID = '2b98d5a0-65f8-4961-958d-ad3620541256'
-        ALIYUN_USER_ID = '06989ce7-86fb-43ca-aec0-313d260af382'
-        IMAGE_NAME = 'registry.cn-shenzhen.aliyuncs.com/tendcode/izone:lts'
+        GITHUB_USER_ID = '32025603'
+        ALIYUN_USER_ID = '100006655230'
+        IMAGE_NAME = 'ccr.ccs.tencentyun.com/zhangyancheng/public_izone:1.0'
     }
     stages {
         stage('Clone sources') {
@@ -16,7 +16,7 @@ pipeline {
                 timeout(time: 30, unit: 'SECONDS')
             }
             steps {
-                git (credentialsId: "${GITHUB_USER_ID}", url: 'https://github.com/Hopetree/izone.git', branch: 'master')
+                git (credentialsId: "${GITHUB_USER_ID}", url: 'https://github.com/zhangmoumou1/izone.git', branch: 'main')
             }
         }
         stage('Build image') {
@@ -28,7 +28,7 @@ pipeline {
         }
         stage('Push image') {
             steps {
-                withDockerRegistry(credentialsId: "${ALIYUN_USER_ID}", url: 'http://registry.cn-shenzhen.aliyuncs.com') {
+                withDockerRegistry(credentialsId: "${ALIYUN_USER_ID}", url: 'ccr.ccs.tencentyun.com/zhangyancheng/public_izone:1.0') {
                     sh "docker push ${IMAGE_NAME}"
                 }
             }
